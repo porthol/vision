@@ -71,7 +71,6 @@
           "options": {
             "browserTarget": "default-angular-app:build",
             "host": "0.0.0.0",
-            "publicHost": "http://127.0.0.1:8082/",
             "disableHostCheck": true
           },
           "configurations": {

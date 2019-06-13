@@ -5,11 +5,9 @@ import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class HttpInterceptorService implements HttpInterceptor {
-    constructor() {
-    }
+    constructor() {}
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
         return next.handle(request).pipe(
             catchError(err => {
                 const error = err.error.message || err.statusText;

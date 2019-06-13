@@ -1,4 +1,11 @@
-# DefaultAngularApp
+# Vision
+
+Gitlab Registry Ui
+
+```bash
+docker build -t vision-dev ./Dockerfile.dev
+docker run -p 4200:4200 -v ./src:/opt/app/src -v ./package.json:/opt/app/package.json -v ./angular.json:/opt/app/angular.json -d vision-dev
+```
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.2.1.
 
