@@ -1,0 +1,11 @@
+FROM node:12 as builder
+
+WORKDIR "/opt/app"
+
+COPY . ./
+
+EXPOSE 4200
+RUN rm -rf node_modules
+RUN npm install
+
+CMD [ "npm", "run", "ng" , "serve", "--disable-host-check", "--host=0.0.0.0"  ]

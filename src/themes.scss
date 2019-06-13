@@ -1,0 +1,9 @@
+@import '~@nebular/theme/styles/theming';
+@import '~@nebular/theme/styles/all';
+
+$nb-enabled-themes: (dark);
+
+$nb-themes: nb-register-theme((
+  // add your variables here like:
+  // color-bg: #4ca6ff,
+), dark, dark);

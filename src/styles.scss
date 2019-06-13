@@ -1,0 +1,22 @@
+@import 'themes';
+
+@import "~@nebular/theme/styles/globals";
+@import '~@nebular/bootstrap/styles/globals';
+
+@include nb-install() {
+    @include nb-theme-global();
+    @include nb-bootstrap-global();
+};
+
+
+.pointer {
+    cursor: pointer !important;
+}
+
+i.eva-hover:hover {
+    fill:#cccccc;
+}
+
+i.eva-hover {
+    fill:#ffffff;
+}
