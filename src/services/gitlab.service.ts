@@ -3,12 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 
 @Injectable()
-export class UserService {
+export class GitlabService {
     private resourceUrl = environment.apiUrl + '/users';
 
     constructor(private httpClient: HttpClient) {}
 
-    get(id: string, criteria = {} as any) {
+    getProjects(id: string, criteria = {} as any) {
         return this.httpClient.get(this.resourceUrl + '/' + id, { params: criteria });
     }
 }

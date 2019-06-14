@@ -1,35 +1,35 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpInterceptorService } from '../services/http-interceptor.service';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
+    NbButtonModule,
+    NbCardModule,
     NbDatepickerModule,
     NbGlobalLogicalPosition,
+    NbIconModule,
+    NbLayoutModule,
     NbMenuModule,
-    NbSidebarService,
     NbThemeModule,
     NbToastrModule
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
-import { UserService } from '../services/user.service';
-
-// import { registerLocaleData } from '@angular/common';
-// import localeFr from '@angular/common/locales/fr';
-//
-// // the second parameter 'fr' is optional
-// registerLocaleData(localeFr, 'fr');
-
+import { GitlabService } from '../services/gitlab.service';
+import { NavbarComponent } from './navbar/navbar.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { RouterModule } from '@angular/router';
+import { AppRoutingModule } from './app-routing.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 @NgModule({
-    declarations: [AppComponent],
+    declarations: [AppComponent, NavbarComponent, DashboardComponent],
     imports: [
         BrowserModule,
+        RouterModule,
         BrowserAnimationsModule,
         HttpClientModule,
-        AppRoutingModule,
         NbDatepickerModule.forRoot(),
         NbThemeModule.forRoot({ name: 'dark' }),
         NbMenuModule.forRoot(),
@@ -38,13 +38,21 @@ import { UserService } from '../services/user.service';
             destroyByClick: true,
             position: NbGlobalLogicalPosition.BOTTOM_END,
             hasIcon: true
-        })
+        }),
+        NbLayoutModule,
+        NbCardModule,
+        NbMenuModule,
+        NbIconModule,
+        AppRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NbButtonModule
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true },
-        NbSidebarService,
-        UserService
+        GitlabService
     ],
     bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+}
