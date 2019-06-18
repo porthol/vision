@@ -1,19 +1,17 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ConfigService } from '../../services/config.service';
+
 @Component({
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
     styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
-    @Output() toggle: EventEmitter<any>;
-
-    constructor() {
-        this.toggle = new EventEmitter();
-    }
+    constructor(private configService: ConfigService) {}
 
     ngOnInit() {}
 
     toggleConfig() {
-        this.toggle.emit(null);
+        this.configService.toggleConfig();
     }
 }

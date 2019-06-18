@@ -23,6 +23,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ConfigService } from '../services/config.service';
 @NgModule({
     declarations: [AppComponent, NavbarComponent, DashboardComponent],
     imports: [
@@ -50,9 +51,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true },
-        GitlabService
+        GitlabService,
+        ConfigService
     ],
     bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule {}

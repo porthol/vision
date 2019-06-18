@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --tsConfig=tsconfig.front.json",
+    "build": "ng build --tsConfig=tsconfig.json",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

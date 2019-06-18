@@ -5,10 +5,7 @@
 export const environment = {
     production: false,
     title: 'vision',
-    securityUrl: window.location.protocol,
-    baseUrl: '://' + window.location.host + '/',
-    canRegister: true,
-    apiUrl: window.location.protocol + '//' + window.location.host + '/api'
+    apiUrl: 'https://gitlab.com/api/v4/'
 };
 
 /*
