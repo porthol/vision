@@ -4,9 +4,10 @@ import { environment } from '../environments/environment';
 import { Project } from '../models/project';
 import { Group } from '../models/group';
 import { Pipeline } from '../models/pipeline';
-import { Registry } from '../models/registry';
 import { map } from 'rxjs/operators';
 import { Tag } from '../models/tag';
+import { Commit } from '../models/commit';
+import { Registry } from '../models/registry';
 
 @Injectable()
 export class GitlabService {
@@ -23,10 +24,7 @@ export class GitlabService {
     getPipelines(projectId: number) {
         return this.httpClient.get<Pipeline[]>(environment.apiUrl + 'projects/' + projectId + '/pipelines').pipe(
             map(pipelines => {
-                return pipelines.map(pipeline => {
-                    pipeline.projectId = projectId;
-                    return pipeline;
-                });
+                return { projectId, pipelines };
             })
         );
     }
@@ -34,7 +32,11 @@ export class GitlabService {
     getRegistry(projectId: number) {
         return this.httpClient
             .get<Registry[]>(environment.apiUrl + 'projects/' + projectId + '/registry/repositories')
-            .pipe(map(registries => registries[0]));
+            .pipe(
+                map(registries => {
+                    return { projectId, registry: registries[0] };
+                })
+            );
     }
 
     getTags(projectId: number, repositoryId: number) {
@@ -50,5 +52,13 @@ export class GitlabService {
                     });
                 })
             );
+    }
+
+    getCommits(projectId: number) {
+        return this.httpClient.get<Commit[]>(environment.apiUrl + 'projects/' + projectId + '/repository/commits').pipe(
+            map(commits => {
+                return { projectId, commits };
+            })
+        );
     }
 }

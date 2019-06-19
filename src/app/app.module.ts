@@ -13,6 +13,7 @@ import {
     NbIconModule,
     NbLayoutModule,
     NbMenuModule,
+    NbSpinnerModule,
     NbThemeModule,
     NbToastrModule
 } from '@nebular/theme';
@@ -47,7 +48,8 @@ import { ConfigService } from '../services/config.service';
         AppRoutingModule,
         FormsModule,
         ReactiveFormsModule,
-        NbButtonModule
+        NbButtonModule,
+        NbSpinnerModule
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true },

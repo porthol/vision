@@ -1,6 +1,12 @@
 import { Pipeline } from './pipeline';
 import { Registry } from './registry';
 import { Tag } from './tag';
+import { Commit } from './commit';
+
+interface Loader {
+    id: string;
+    status: boolean;
+}
 
 export class Project {
     id: number;
@@ -11,4 +17,9 @@ export class Project {
     registry: Registry;
     tags: Tag[];
     path_with_namespace: string;
+    error = false;
+    default_branch: string;
+    web_url: string;
+    commits: Commit[];
+    loaders: Loader[] = [];
 }
