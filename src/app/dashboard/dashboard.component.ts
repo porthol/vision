@@ -119,7 +119,7 @@ export class DashboardComponent implements OnInit {
         localStorage.setItem('private_token', this.configForm.getRawValue().privateToken || '');
         localStorage.setItem('groups', this.configForm.getRawValue().groups || '');
         localStorage.setItem('repo_exclude', this.configForm.getRawValue().repoExclude || '');
-        localStorage.setItem('refresh_time', this.configForm.getRawValue().refresh_time || '');
+        localStorage.setItem('refresh_time', this.configForm.getRawValue().refreshTime || '');
 
         this.config = { ...this.configForm.getRawValue() };
         this.repos = [];
