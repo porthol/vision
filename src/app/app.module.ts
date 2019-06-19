@@ -6,6 +6,7 @@ import { HttpInterceptorService } from '../services/http-interceptor.service';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
+    NbAlertModule,
     NbButtonModule,
     NbCardModule,
     NbDatepickerModule,
@@ -49,7 +50,8 @@ import { ConfigService } from '../services/config.service';
         FormsModule,
         ReactiveFormsModule,
         NbButtonModule,
-        NbSpinnerModule
+        NbSpinnerModule,
+        NbAlertModule
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true },

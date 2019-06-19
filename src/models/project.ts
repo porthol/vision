@@ -22,4 +22,6 @@ export class Project {
     web_url: string;
     commits: Commit[];
     loaders: Loader[] = [];
+    refs: string[];
+    lastPipelines: { ref: string; pipeline: Pipeline }[];
 }

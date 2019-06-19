@@ -1,11 +1,11 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GitlabService } from '../../services/gitlab.service';
 import { Project } from '../../models/project';
 import { ConfigService } from '../../services/config.service';
 import { concatAll, flatMap, map } from 'rxjs/operators';
 import { Tag } from '../../models/tag';
-import { Observable, Subject } from 'rxjs';
+import { interval, Observable, Subject } from 'rxjs';
 
 @Component({
     selector: 'app-dashboard',
@@ -21,14 +21,17 @@ export class DashboardComponent implements OnInit {
     loadPipelines: Subject<Project>;
     loadTags: Subject<Project>;
     loadCommits: Subject<Project>;
+    loader: boolean;
 
     constructor(private gitlabService: GitlabService, private configService: ConfigService) {
         this.configForm = new FormGroup({
             privateToken: new FormControl(),
             groups: new FormControl(),
-            repoExclude: new FormControl()
+            repoExclude: new FormControl(),
+            refreshTime: new FormControl(5, Validators.min(5))
         });
 
+        this.loader = true;
         this.loadConfig();
         this.loadPipelines = new Subject<Project>();
         this.loadPipelines
@@ -40,12 +43,11 @@ export class DashboardComponent implements OnInit {
             )
             .subscribe((response: any) => {
                 const project = this.repos.find((project: Project) => project.id === response.projectId);
-                if (response.pipelines) {
-                    response.pipelines.map(pipeline => {
-                        if (project) {
-                            (project.pipelines || (project.pipelines = [])).push(pipeline);
-                            // console.log(Array.from(new Set(project.pipelines.map(pipeline => pipeline.ref))));
-                        }
+                if (response.pipelines.length > 0) {
+                    project.pipelines = [...response.pipelines];
+                    project.refs = Array.from(new Set(project.pipelines.map(pipeline => pipeline.ref)));
+                    project.lastPipelines = project.refs.map(ref => {
+                        return { ref, pipeline: project.pipelines.find(pipeline => pipeline.ref === ref) };
                     });
                 }
                 const loader = project.loaders.find(loader => loader.id === 'pipelines');
@@ -117,9 +119,11 @@ export class DashboardComponent implements OnInit {
         localStorage.setItem('private_token', this.configForm.getRawValue().privateToken || '');
         localStorage.setItem('groups', this.configForm.getRawValue().groups || '');
         localStorage.setItem('repo_exclude', this.configForm.getRawValue().repoExclude || '');
+        localStorage.setItem('refresh_time', this.configForm.getRawValue().refresh_time || '');
 
         this.config = { ...this.configForm.getRawValue() };
         this.repos = [];
+        this.loader = true;
         this.loadRepos();
     }
 
@@ -128,8 +132,12 @@ export class DashboardComponent implements OnInit {
             this.config = {
                 privateToken: localStorage.getItem('private_token'),
                 groups: localStorage.getItem('groups'),
-                repoExclude: localStorage.getItem('repo_exclude')
+                repoExclude: localStorage.getItem('repo_exclude'),
+                refreshTime: localStorage.getItem('refresh_time')
             };
+            if (this.config.refreshTime < 5) {
+                this.config.refreshTime = 5;
+            }
             this.configForm.patchValue(this.config);
             this.configService.closeConfig();
             this.loadRepos();
@@ -137,8 +145,6 @@ export class DashboardComponent implements OnInit {
     }
 
     isLoading(repo: Project) {
-        console.log(repo.loaders);
-        console.log(repo.loaders);
         return repo.loaders.reduce((sum, next) => sum || next.status, false);
     }
 
@@ -202,5 +208,45 @@ export class DashboardComponent implements OnInit {
                     loader.status = false;
                 });
             });
+
+        interval(this.config.refreshTime * 1000)
+            .pipe(
+                map(() => {
+                    this.loader = false;
+                    return this.repos.map(project => {
+                        project.loaders = [];
+                        project.loaders.push({ id: 'start', status: true });
+                        this.loadPipelines.next(project);
+                        this.loadTags.next(project);
+                        this.loadCommits.next(project);
+                        return project;
+                    });
+                })
+            )
+            .subscribe(projects => {
+                projects.map(project => {
+                    const loader = project.loaders.find(loader => loader.id === 'start');
+                    loader.status = false;
+                });
+            });
+    }
+
+    pipelineStatusToNbStatus(pipelineStatus: string) {
+        switch (pipelineStatus) {
+            case 'running':
+                return 'info';
+            case 'pending':
+                return 'warning';
+            case 'success':
+                return 'success';
+            case 'failed':
+                return 'danger';
+            case 'canceled':
+                return '';
+            case 'skipped':
+                return 'primary';
+            default:
+                return '';
+        }
     }
 }
