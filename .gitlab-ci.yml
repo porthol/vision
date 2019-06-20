@@ -14,7 +14,7 @@ build-master:
   script:
     - docker build --pull -t "$CI_REGISTRY_IMAGE" .
     - docker push "$CI_REGISTRY_IMAGE"
-    - docker build --pull -t "$DOCKER_HUB_IMAGE"
+    - docker build --pull -t "$DOCKER_HUB_IMAGE" .
     - docker push "$DOCKER_HUB_IMAGE"
   only:
     - master
@@ -24,7 +24,7 @@ build:
   script:
     - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-    - docker build --pull -t "$DOCKER_HUB_IMAGE:$CI_COMMIT_REF_SLUG"
+    - docker build --pull -t "$DOCKER_HUB_IMAGE:$CI_COMMIT_REF_SLUG" .
     - docker push "$DOCKER_HUB_IMAGE:$CI_COMMIT_REF_SLUG"
   except:
     - master
