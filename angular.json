@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "default-angular-app": {
+    "vision": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/default-angular-app",
+            "outputPath": "dist/vision",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -38,7 +38,7 @@
                 }
               ],
               "optimization": true,
-              "baseHref": "/en/",
+              "baseHref": "/",
               "outputHashing": "all",
               "sourceMap": false,
               "extractCss": true,
@@ -54,38 +54,20 @@
                   "maximumError": "5mb"
                 }
               ]
-            },
-            "fr": {
-              "aot": true,
-              "outputPath": "dist/front-fr/",
-              "i18nFile": "src/locale/messages.fr.xlf",
-              "i18nFormat": "xlf",
-              "i18nLocale": "fr",
-              "baseHref": "/fr/",
-              "i18nMissingTranslation": "warn"
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "default-angular-app:build",
+            "browserTarget": "vision:build",
             "host": "0.0.0.0",
             "disableHostCheck": true
           },
           "configurations": {
             "production": {
-              "browserTarget": "default-angular-app:build:production"
-            },
-            "fr": {
-              "browserTarget": "default-angular-app:build:fr"
+              "browserTarget": "vision:build:production"
             }
-          }
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "default-angular-app:build"
           }
         },
         "test": {
@@ -119,7 +101,7 @@
         }
       }
     },
-    "default-angular-app-e2e": {
+    "vision-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -128,11 +110,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "default-angular-app:serve"
+            "devServerTarget": "vision:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "default-angular-app:serve:production"
+              "devServerTarget": "vision:serve:production"
             }
           }
         },
