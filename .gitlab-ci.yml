@@ -20,9 +20,9 @@ build-master:
 build:
   stage: build
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-    - docker build --pull -t "$DOCKER_HUB_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$DOCKER_HUB_IMAGE:$CI_COMMIT_REF_SLUG"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
+    - docker build --pull -t "$DOCKER_HUB_IMAGE:$CI_COMMIT_REF_NAME" .
+    - docker push "$DOCKER_HUB_IMAGE:$CI_COMMIT_REF_NAME"
   except:
     - master
