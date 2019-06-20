@@ -74,15 +74,13 @@ export class DashboardComponent implements OnInit {
                 })
             )
             .subscribe((tags: Tag[]) => {
-                if (tags) {
-                    tags.map(tag => {
-                        const project = this.repos.find((project: Project) => project.id === tag.projectId);
-                        if (project) {
-                            (project.tags || (project.tags = [])).push(tag);
-                            const loader = project.loaders.find(loader => loader.id === 'tags');
-                            loader.status = false;
-                        }
-                    });
+                if (tags.length > 0) {
+                    const project = this.repos.find((project: Project) => project.id === tags[0].projectId);
+                    if (project) {
+                        project.tags = tags;
+                    }
+                    const loader = project.loaders.find(loader => loader.id === 'tags');
+                    loader.status = false;
                 }
             });
 
@@ -108,7 +106,8 @@ export class DashboardComponent implements OnInit {
             });
     }
 
-    ngOnInit() {}
+    ngOnInit() {
+    }
 
     hideConfig() {
         return this.configService.hideConfigWindow;

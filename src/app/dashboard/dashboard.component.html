@@ -80,6 +80,9 @@
             <nb-card-body *ngIf="repo.pipelines">
                 <nb-alert *ngFor="let pipeline of repo.lastPipelines" [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)" ><a class="a-not-blue" href="{{pipeline.pipeline.web_url}}" target="_blank">{{pipeline.ref}} : {{pipeline.pipeline.status}}</a></nb-alert>
             </nb-card-body>
+            <nb-card-body *ngIf="repo.tags">
+                Registry tags : <ul><li *ngFor="let tag of repo.tags">{{tag.name}}</li></ul>
+            </nb-card-body>
         </nb-card>
     </div>
 </div>
