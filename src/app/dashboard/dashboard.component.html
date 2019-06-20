@@ -63,7 +63,7 @@
 </div>
 
 <div class="row" *ngIf="repos.length > 0">
-    <div class="col-4" *ngFor="let repo of repos">
+    <div class="col-3" *ngFor="let repo of repos">
         <nb-card [nbSpinner]="isLoading(repo) && loader">
             <nb-card-header><span><a href="{{repo.web_url}}" target="_blank"
                                      class="">{{repo.path_with_namespace}}</a>

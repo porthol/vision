@@ -106,8 +106,7 @@ export class DashboardComponent implements OnInit {
             });
     }
 
-    ngOnInit() {
-    }
+    ngOnInit() {}
 
     hideConfig() {
         return this.configService.hideConfigWindow;

@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
     selector: 'app-root',
     template:
         '<nb-layout>' +
-        '  <nb-layout-header fixed>' +
+        '  <nb-layout-header>' +
         '    <app-navbar></app-navbar>' +
         '  </nb-layout-header>' +
         '  <nb-layout-column>' +
