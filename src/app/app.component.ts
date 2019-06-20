@@ -2,7 +2,15 @@ import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-root',
-    template: '<router-outlet></router-outlet>'
+    template:
+        '<nb-layout>' +
+        '  <nb-layout-header>' +
+        '    <app-navbar></app-navbar>' +
+        '  </nb-layout-header>' +
+        '  <nb-layout-column>' +
+        '      <app-dashboard></app-dashboard>' +
+        '  </nb-layout-column>' +
+        '</nb-layout>'
 })
 export class AppComponent {
     constructor() {}
