@@ -78,7 +78,8 @@
                 Last commit {{repo.commits[0].short_id}} : {{repo.commits[0].title}}
             </nb-card-body>
             <nb-card-body *ngIf="repo.pipelines">
-                <nb-alert *ngFor="let pipeline of repo.lastPipelines" [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)" ><a class="a-not-blue" href="{{pipeline.pipeline.web_url}}" target="_blank">{{pipeline.ref}} : {{pipeline.pipeline.status}}</a></nb-alert>
+<!--                <nb-alert *ngFor="let pipeline of repo.lastPipelines" [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)" ><a class="a-not-blue" href="{{pipeline.pipeline.web_url}}" target="_blank">{{pipeline.ref}} : {{pipeline.pipeline.status}}</a></nb-alert>-->
+                <nb-progress-bar class="mb-3" *ngFor="let pipeline of repo.lastPipelines" [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)" [value]="pipelineStatusToValue(pipeline.pipeline.status)"><a class="a-not-blue" href="{{pipeline.pipeline.web_url}}" target="_blank">{{pipeline.ref}} : {{pipeline.pipeline.status}}</a></nb-progress-bar>
             </nb-card-body>
             <nb-card-body *ngIf="repo.tags">
                 Registry tags : <ul><li *ngFor="let tag of repo.tags">{{tag.name}}</li></ul>

@@ -121,8 +121,10 @@ export class DashboardComponent implements OnInit {
 
         this.config = { ...this.configForm.getRawValue() };
         this.repos = [];
-        this.loader = true;
-        this.loadRepos();
+        if (localStorage.getItem('private_token')) {
+            this.loader = true;
+            this.loadRepos();
+        }
     }
 
     loadConfig() {
@@ -245,6 +247,25 @@ export class DashboardComponent implements OnInit {
                 return 'primary';
             default:
                 return '';
+        }
+    }
+
+    pipelineStatusToValue(pipelineStatus: string) {
+        switch (pipelineStatus) {
+            case 'running':
+                return 60;
+            case 'pending':
+                return 10;
+            case 'success':
+                return 100;
+            case 'failed':
+                return 40;
+            case 'canceled':
+                return 0;
+            case 'skipped':
+                return 0;
+            default:
+                return 0;
         }
     }
 }

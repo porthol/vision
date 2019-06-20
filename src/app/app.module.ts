@@ -14,6 +14,7 @@ import {
     NbIconModule,
     NbLayoutModule,
     NbMenuModule,
+    NbProgressBarModule,
     NbSpinnerModule,
     NbThemeModule,
     NbToastrModule
@@ -51,7 +52,8 @@ import { ConfigService } from '../services/config.service';
         ReactiveFormsModule,
         NbButtonModule,
         NbSpinnerModule,
-        NbAlertModule
+        NbAlertModule,
+        NbProgressBarModule
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true },
