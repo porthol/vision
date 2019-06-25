@@ -22,3 +22,5 @@ You can exclude some repo on the config input.
 
 
 Available on Docker HUB : https://hub.docker.com/r/porthol/vision
+
+![Example of vision app](https://raw.githubusercontent.com/porthol/vision/develop/README_example.png?raw=true "Example of vision app")
