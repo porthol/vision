@@ -19,3 +19,6 @@ On gitlab, go to profile, settings, access tokens, and generate one with all 'ap
 
 On the UI give a the private token, on config popup. Write the name of the groups you want to follow.
 You can exclude some repo on the config input.
+
+
+Available on Docker HUB : https://hub.docker.com/r/porthol/vision
