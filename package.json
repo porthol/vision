@@ -10,7 +10,7 @@
     "e2e": "ng e2e",
     "clean": "rimraf dist",
     "prettier": "prettier --write './src/**/*.ts'",
-    "precommit": "npm run prettier && npm run tslint && npm run build"
+    "precommit": "npm run prettier && npm run lint"
   },
   "private": true,
   "dependencies": {

@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GitlabService } from '../../services/gitlab.service';
 import { Project } from '../../models/project';
 import { ConfigService } from '../../services/config.service';
-import { concatAll, flatMap, map } from 'rxjs/operators';
+import { concatAll, flatMap, map, tap } from 'rxjs/operators';
 import { Tag } from '../../models/tag';
 import { interval, Observable, Subject } from 'rxjs';
 
@@ -172,7 +172,7 @@ export class DashboardComponent implements OnInit {
             .pipe(
                 map(groups =>
                     groups.filter(group =>
-                        groupsNames.length > 0 ? groupsNames.indexOf(group.path) !== -1 : true
+                        groupsNames.length > 0 ? groupsNames.indexOf(group['full_path']) !== -1 : true
                     )
                 ),
                 flatMap(groups => {
