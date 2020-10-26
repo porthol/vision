@@ -12,6 +12,7 @@ import {
     NbDatepickerModule,
     NbGlobalLogicalPosition,
     NbIconModule,
+    NbInputModule,
     NbLayoutModule,
     NbMenuModule,
     NbProgressBarModule,
@@ -53,7 +54,8 @@ import { ConfigService } from '../services/config.service';
         NbButtonModule,
         NbSpinnerModule,
         NbAlertModule,
-        NbProgressBarModule
+        NbProgressBarModule,
+        NbInputModule
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true },

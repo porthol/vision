@@ -114,12 +114,12 @@ export class DashboardComponent implements OnInit {
 
     saveConfig() {
         this.configService.closeConfig();
-        localStorage.setItem('private_token', this.configForm.getRawValue().privateToken || '');
-        localStorage.setItem('groups', this.configForm.getRawValue().groups || '');
-        localStorage.setItem('repo_exclude', this.configForm.getRawValue().repoExclude || '');
-        localStorage.setItem('refresh_time', this.configForm.getRawValue().refreshTime || '');
+        localStorage.setItem('private_token', this.configForm.value.privateToken || '');
+        localStorage.setItem('groups', this.configForm.value.groups || '');
+        localStorage.setItem('repo_exclude', this.configForm.value.repoExclude || '');
+        localStorage.setItem('refresh_time', this.configForm.value.refreshTime || '');
 
-        this.config = { ...this.configForm.getRawValue() };
+        this.config = { ...this.configForm.value };
         this.repos = [];
         if (localStorage.getItem('private_token')) {
             this.loader = true;
@@ -172,7 +172,7 @@ export class DashboardComponent implements OnInit {
             .pipe(
                 map(groups =>
                     groups.filter(group =>
-                        groupsNames.length > 0 ? groupsNames.indexOf(group.name.toLowerCase()) !== -1 : true
+                        groupsNames.length > 0 ? groupsNames.indexOf(group.path) !== -1 : true
                     )
                 ),
                 flatMap(groups => {

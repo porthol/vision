@@ -9,7 +9,6 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "clean": "rimraf dist",
-    "tslint": "tslint -c tslint.json '{src/**/*.ts,!src/__front__/**/.ts}'",
     "prettier": "prettier --write './src/**/*.ts'",
     "precommit": "npm run prettier && npm run tslint && npm run build"
   },
