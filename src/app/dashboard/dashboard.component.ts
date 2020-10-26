@@ -155,7 +155,6 @@ export class DashboardComponent implements OnInit {
         this.mainLoading = true;
         if (this.config.groups) {
             groupsNames = this.config.groups
-                .toLowerCase()
                 .split(',')
                 .map(name => name.trim());
         }
