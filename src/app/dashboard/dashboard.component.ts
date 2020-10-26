@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GitlabService } from '../../services/gitlab.service';
 import { Project } from '../../models/project';
 import { ConfigService } from '../../services/config.service';
-import { concatAll, flatMap, map, tap } from 'rxjs/operators';
+import { concatAll, flatMap, map } from 'rxjs/operators';
 import { Tag } from '../../models/tag';
 import { interval, Observable, Subject } from 'rxjs';
 
@@ -154,9 +154,7 @@ export class DashboardComponent implements OnInit {
         let reposToExclude = [];
         this.mainLoading = true;
         if (this.config.groups) {
-            groupsNames = this.config.groups
-                .split(',')
-                .map(name => name.trim());
+            groupsNames = this.config.groups.split(',').map(name => name.trim());
         }
 
         if (this.config.repoExclude) {
