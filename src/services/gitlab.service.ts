@@ -8,12 +8,14 @@ import { map } from 'rxjs/operators';
 import { Tag } from '../models/tag';
 import { Commit } from '../models/commit';
 import { Registry } from '../models/registry';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class GitlabService {
-    constructor(private httpClient: HttpClient) {}
+    constructor(private httpClient: HttpClient) {
+    }
 
-    getGroups() {
+    getGroups(): Observable<Group[]> {
         return this.httpClient.get<Group[]>(environment.apiUrl + 'groups');
     }
 

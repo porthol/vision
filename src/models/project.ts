@@ -23,5 +23,6 @@ export class Project {
     commits: Commit[];
     loaders: Loader[] = [];
     refs: string[];
+    exclude = false;
     lastPipelines: { ref: string; pipeline: Pipeline }[];
 }

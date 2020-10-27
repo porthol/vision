@@ -1,11 +1,13 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GitlabService } from '../../services/gitlab.service';
 import { Project } from '../../models/project';
 import { ConfigService } from '../../services/config.service';
-import { concatAll, flatMap, map, tap } from 'rxjs/operators';
+import { concatAll, flatMap, map, scan, switchMap, tap } from 'rxjs/operators';
 import { Tag } from '../../models/tag';
 import { interval, Observable, Subject } from 'rxjs';
+import { Group } from '../../models/group';
+import { Config } from '../../models/config';
 
 @Component({
     selector: 'app-dashboard',
@@ -14,26 +16,49 @@ import { interval, Observable, Subject } from 'rxjs';
 })
 export class DashboardComponent implements OnInit {
     @Output() toggleDashboard: EventEmitter<any>;
-    configForm: FormGroup;
-    config: any;
-    repos: Project[] = [];
-    mainLoading: boolean;
-    loadPipelines: Subject<Project>;
-    loadTags: Subject<Project>;
-    loadCommits: Subject<Project>;
+    configForm: FormGroup = new FormGroup({
+        privateToken: new FormControl(),
+        refreshTime: new FormControl(5, Validators.min(5))
+    });
+    config: Config;
+    loadGroups$ = new Subject();
+    loadProjects$ = new Subject<Group[]>();
+
+    loadPipelines = new Subject<Project>();
+    loadTags = new Subject<Project>();
+    loadCommits = new Subject<Project>();
     loader: boolean;
+    mainLoading = false;
+    showGroups = false;
+    showProjects = false;
+
+    groups$: Observable<Group[]> = this.loadGroups$
+        .pipe(
+            tap(() => this.showGroups = true),
+            tap(() => this.mainLoading = true),
+            switchMap(() => this.gitlabService
+                .getGroups()),
+            tap(() => this.mainLoading = false),
+        );
+
+    projects$: Observable<Project[]> = this.loadProjects$
+        .pipe(
+            tap(() => this.showProjects = true),
+            tap(() => this.mainLoading = true),
+            flatMap(groups =>  groups.map(group => this.gitlabService.getProjects(group.id))),
+            concatAll(),
+            scan((acc, curr) => [...acc, ...curr], []),
+            tap(() => this.mainLoading = false),
+            tap(projects => this.setProjectsInclude(projects))
+        );
+
+    groupsSelected: Group[] = [];
+    projectsSelected: Project[] = [];
 
     constructor(private gitlabService: GitlabService, private configService: ConfigService) {
-        this.configForm = new FormGroup({
-            privateToken: new FormControl(),
-            groups: new FormControl(),
-            repoExclude: new FormControl(),
-            refreshTime: new FormControl(5, Validators.min(5))
-        });
 
         this.loader = true;
         this.loadConfig();
-        this.loadPipelines = new Subject<Project>();
         this.loadPipelines
             .pipe(
                 flatMap((project: Project) => {
@@ -42,7 +67,7 @@ export class DashboardComponent implements OnInit {
                 })
             )
             .subscribe((response: any) => {
-                const project = this.repos.find((project: Project) => project.id === response.projectId);
+                const project = this.projectsSelected.find((project: Project) => project.id === response.projectId);
                 if (response.pipelines.length > 0) {
                     project.pipelines = [...response.pipelines];
                     project.refs = Array.from(new Set(project.pipelines.map(pipeline => pipeline.ref)));
@@ -54,7 +79,6 @@ export class DashboardComponent implements OnInit {
                 loader.status = false;
             });
 
-        this.loadTags = new Subject<Project>();
         this.loadTags
             .pipe(
                 flatMap(project => {
@@ -62,7 +86,7 @@ export class DashboardComponent implements OnInit {
                     return this.gitlabService.getRegistry(project.id);
                 }),
                 flatMap(response => {
-                    const project = this.repos.find((project: Project) => project.id === response.projectId);
+                    const project = this.projectsSelected.find((project: Project) => project.id === response.projectId);
                     if (response.registry) {
                         project.registry = response.registry;
                         return this.gitlabService.getTags(project.id, response.registry.id);
@@ -75,7 +99,7 @@ export class DashboardComponent implements OnInit {
             )
             .subscribe((tags: Tag[]) => {
                 if (tags.length > 0) {
-                    const project = this.repos.find((project: Project) => project.id === tags[0].projectId);
+                    const project = this.projectsSelected.find((project: Project) => project.id === tags[0].projectId);
                     if (project) {
                         project.tags = tags;
                     }
@@ -84,7 +108,6 @@ export class DashboardComponent implements OnInit {
                 }
             });
 
-        this.loadCommits = new Subject<Project>();
         this.loadCommits
             .pipe(
                 flatMap(project => {
@@ -94,7 +117,7 @@ export class DashboardComponent implements OnInit {
             )
             .subscribe(response => {
                 if (response.commits) {
-                    const project = this.repos.find((project: Project) => project.id === response.projectId);
+                    const project = this.projectsSelected.find((project: Project) => project.id === response.projectId);
                     response.commits.map(commit => {
                         if (project) {
                             const loader = project.loaders.find(loader => loader.id === 'commits');
@@ -106,7 +129,8 @@ export class DashboardComponent implements OnInit {
             });
     }
 
-    ngOnInit() {}
+    ngOnInit() {
+    }
 
     hideConfig() {
         return this.configService.hideConfigWindow;
@@ -114,120 +138,29 @@ export class DashboardComponent implements OnInit {
 
     saveConfig() {
         this.configService.closeConfig();
-        localStorage.setItem('private_token', this.configForm.value.privateToken || '');
-        localStorage.setItem('groups', this.configForm.value.groups || '');
-        localStorage.setItem('repo_exclude', this.configForm.value.repoExclude || '');
-        localStorage.setItem('refresh_time', this.configForm.value.refreshTime || '');
+        this.config = { ...this.config, ...this.configForm.value };
+        localStorage.setItem('config', JSON.stringify(this.config));
 
-        this.config = { ...this.configForm.value };
-        this.repos = [];
-        if (localStorage.getItem('private_token')) {
+        if (this.config.privateToken) {
             this.loader = true;
-            this.loadRepos();
+            this.loadGroups$.next();
         }
     }
 
     loadConfig() {
-        if (localStorage.getItem('private_token')) {
-            this.config = {
-                privateToken: localStorage.getItem('private_token'),
-                groups: localStorage.getItem('groups'),
-                repoExclude: localStorage.getItem('repo_exclude'),
-                refreshTime: localStorage.getItem('refresh_time')
-            };
+        this.config = JSON.parse(localStorage.getItem('config'));
+        if (this.config.privateToken) {
             if (this.config.refreshTime < 5) {
                 this.config.refreshTime = 5;
             }
             this.configForm.patchValue(this.config);
             this.configService.closeConfig();
-            this.loadRepos();
+            this.loadGroups$.next();
         }
     }
 
     isLoading(repo: Project) {
         return repo.loaders.reduce((sum, next) => sum || next.status, false);
-    }
-
-    loadRepos() {
-        const tmpRepos = [];
-        let groupsNames = [];
-        let reposToExclude = [];
-        this.mainLoading = true;
-        if (this.config.groups) {
-            groupsNames = this.config.groups
-                .split(',')
-                .map(name => name.trim());
-        }
-
-        if (this.config.repoExclude) {
-            reposToExclude = this.config.repoExclude
-                .toLowerCase()
-                .split(',')
-                .map(name => name.trim());
-        }
-
-        this.gitlabService
-            .getGroups()
-            .pipe(
-                map(groups =>
-                    groups.filter(group =>
-                        groupsNames.length > 0 ? groupsNames.indexOf(group['full_path']) !== -1 : true
-                    )
-                ),
-                flatMap(groups => {
-                    return groups.map(group => this.gitlabService.getProjects(group.id));
-                }),
-                concatAll(),
-                map((projects: Project[]) => {
-                    projects = projects.filter(project =>
-                        reposToExclude.length > 0 ? reposToExclude.indexOf(project.name.toLowerCase()) === -1 : true
-                    );
-                    tmpRepos.push([...projects]);
-                    return projects;
-                }),
-                map(projects => {
-                    this.repos = tmpRepos.flatMap(projects => {
-                        return projects;
-                    });
-                    this.mainLoading = false;
-
-                    return projects.map(project => {
-                        project.loaders = [];
-                        project.loaders.push({ id: 'start', status: true });
-                        this.loadPipelines.next(project);
-                        this.loadTags.next(project);
-                        this.loadCommits.next(project);
-                        return project;
-                    });
-                })
-            )
-            .subscribe(projects => {
-                projects.map(project => {
-                    const loader = project.loaders.find(loader => loader.id === 'start');
-                    loader.status = false;
-                });
-            });
-
-        interval(this.config.refreshTime * 1000)
-            .pipe(
-                map(() => {
-                    this.loader = false;
-                    return this.repos.map(project => {
-                        project.loaders = [];
-                        project.loaders.push({ id: 'start', status: true });
-                        this.loadPipelines.next(project);
-                        this.loadTags.next(project);
-                        this.loadCommits.next(project);
-                        return project;
-                    });
-                })
-            )
-            .subscribe(projects => {
-                projects.map(project => {
-                    const loader = project.loaders.find(loader => loader.id === 'start');
-                    loader.status = false;
-                });
-            });
     }
 
     pipelineStatusToNbStatus(pipelineStatus: string) {
@@ -266,5 +199,50 @@ export class DashboardComponent implements OnInit {
             default:
                 return 0;
         }
+    }
+
+    setGroupSelected(group: Group[]) {
+        this.groupsSelected = group.filter(g => g.selected);
+        this.config.groups = this.groupsSelected.map(g => g.id);
+    }
+
+    nextProjects() {
+        this.showGroups = false;
+        this.loadProjects$.next(this.groupsSelected);
+    }
+
+    setProjectsInclude(projects: Project[]) {
+        this.projectsSelected = projects.filter(p => !p.exclude);
+        this.config.projects = this.projectsSelected.map(p => p.id);
+    }
+
+    finishSelection() {
+        this.showProjects = false;
+        this.projectsSelected.forEach(p => {
+            this.loadPipelines.next(p);
+            this.loadTags.next(p);
+            this.loadCommits.next(p);
+        });
+
+        interval(this.config.refreshTime * 1000)
+            .pipe(
+                map(() => {
+                    this.loader = false;
+                    return this.projectsSelected.map(project => {
+                        project.loaders = [];
+                        project.loaders.push({ id: 'start', status: true });
+                        this.loadPipelines.next(project);
+                        this.loadTags.next(project);
+                        this.loadCommits.next(project);
+                        return project;
+                    });
+                })
+            )
+            .subscribe(projects => {
+                projects.map(project => {
+                    const loader = project.loaders.find(loader => loader.id === 'start');
+                    loader.status = false;
+                });
+            });
     }
 }
