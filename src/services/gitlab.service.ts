@@ -12,8 +12,7 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class GitlabService {
-    constructor(private httpClient: HttpClient) {
-    }
+    constructor(private httpClient: HttpClient) {}
 
     getGroups(): Observable<Group[]> {
         return this.httpClient.get<Group[]>(environment.apiUrl + 'groups');

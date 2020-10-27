@@ -32,31 +32,27 @@ export class DashboardComponent implements OnInit {
     showGroups = false;
     showProjects = false;
 
-    groups$: Observable<Group[]> = this.loadGroups$
-        .pipe(
-            tap(() => this.showGroups = true),
-            tap(() => this.mainLoading = true),
-            switchMap(() => this.gitlabService
-                .getGroups()),
-            tap(() => this.mainLoading = false),
-        );
+    groups$: Observable<Group[]> = this.loadGroups$.pipe(
+        tap(() => (this.showGroups = true)),
+        tap(() => (this.mainLoading = true)),
+        switchMap(() => this.gitlabService.getGroups()),
+        tap(() => (this.mainLoading = false))
+    );
 
-    projects$: Observable<Project[]> = this.loadProjects$
-        .pipe(
-            tap(() => this.showProjects = true),
-            tap(() => this.mainLoading = true),
-            flatMap(groups =>  groups.map(group => this.gitlabService.getProjects(group.id))),
-            concatAll(),
-            scan((acc, curr) => [...acc, ...curr], []),
-            tap(() => this.mainLoading = false),
-            tap(projects => this.setProjectsInclude(projects))
-        );
+    projects$: Observable<Project[]> = this.loadProjects$.pipe(
+        tap(() => (this.showProjects = true)),
+        tap(() => (this.mainLoading = true)),
+        flatMap(groups => groups.map(group => this.gitlabService.getProjects(group.id))),
+        concatAll(),
+        scan((acc, curr) => [...acc, ...curr], []),
+        tap(() => (this.mainLoading = false)),
+        tap(projects => this.setProjectsInclude(projects))
+    );
 
     groupsSelected: Group[] = [];
     projectsSelected: Project[] = [];
 
     constructor(private gitlabService: GitlabService, private configService: ConfigService) {
-
         this.loader = true;
         this.loadConfig();
         this.loadPipelines
@@ -129,8 +125,7 @@ export class DashboardComponent implements OnInit {
             });
     }
 
-    ngOnInit() {
-    }
+    ngOnInit() {}
 
     hideConfig() {
         return this.configService.hideConfigWindow;
