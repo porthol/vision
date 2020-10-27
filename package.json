@@ -32,6 +32,7 @@
         "core-js": "^2.6.9",
         "eva-icons": "^1.1.1",
         "jquery": "^3.4.1",
+        "ng-packagr": "^10.1.2",
         "popper.js": "^1.15.0",
         "rxjs": "~6.6.3",
         "tslib": "^1.9.0",
