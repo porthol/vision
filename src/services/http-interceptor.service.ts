@@ -5,22 +5,24 @@ import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class HttpInterceptorService implements HttpInterceptor {
-    constructor() {}
+  constructor() {}
 
-    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        request = request.clone({
-            headers: request.headers.set('PRIVATE-TOKEN', localStorage.getItem('private_token'))
-        });
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const config = localStorage.getItem('config') ? JSON.parse(localStorage.getItem('config')) : {};
 
-        if (!request.headers.has('Content-Type')) {
-            request = request.clone({ headers: request.headers.set('Content-Type', 'application/json') });
-        }
+    request = request.clone({
+      headers: request.headers.set('PRIVATE-TOKEN', config.privateToken)
+    });
 
-        return next.handle(request).pipe(
-            catchError(err => {
-                const error = err.error.message || err.statusText;
-                return throwError(error);
-            })
-        );
+    if (!request.headers.keys().length || !request.headers.has('Content-Type')) {
+      request = request.clone({ headers: request.headers.set('Content-Type', 'application/json') });
     }
+
+    return next.handle(request).pipe(
+      catchError(err => {
+        const error = err.error.message || err.statusText;
+        return throwError(error);
+      })
+    );
+  }
 }

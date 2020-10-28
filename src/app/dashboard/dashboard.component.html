@@ -1,89 +1,153 @@
-<div class="row justify-content-center" [hidden]="hideConfig()">
-    <div class="col-6">
-        <nb-card>
-            <nb-card-header class="text-center">
-                Configuration
-            </nb-card-header>
-            <nb-card-body>
-                <form [formGroup]="configForm" (ngSubmit)="saveConfig()">
-                    <div class="form-group row">
-                        <label class="private_token" class="col-form-label col-sm-3">Your Private Token</label>
-                        <div class="col-sm-9">
-                            <input placeholder="Private Token" id="private_token" class="form-control"
-                                   name="private_token"
-                                   formControlName="privateToken" nbInput>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="groups" class="col-form-label col-sm-3">Group Name</label>
-                        <div class="col-sm-9">
-                            <input placeholder="Your groups" id="groups" class="form-control" name="groups"
-                                   formControlName="groups" nbInput>
-                            <small class="form-text text-muted">If no group specified get all group available. Group
-                                separate by comma
-                            </small>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="repoExclude" class="col-form-label col-sm-3">Repo to exclude</label>
-                        <div class="col-sm-9">
-                            <input placeholder="Repo to exclude" id="repoExclude" class="form-control"
-                                   name="repoExclude"
-                                   formControlName=repoExclude nbInput>
-                            <small class="form-text text-muted">Repository name separate by comma</small>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="refreshTime" class="col-form-label col-sm-3">Refresh time</label>
-                        <div class="col-sm-9">
-                            <input placeholder="Refresh time" id="refreshTime" class="form-control" type="number"
-                                   name="refreshTime"
-                                   formControlName=refreshTime nbInput>
-                            <small class="form-text text-muted">Not under 5 secs</small>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <button nbButton type="submit" [disabled]="!configForm.valid" fullWidth>
-                            <nb-icon icon="checkmark-outline"></nb-icon>
-                            Save
-                        </button>
-                    </div>
-                </form>
-            </nb-card-body>
-        </nb-card>
-    </div>
+<div class="row justify-content-center" [hidden]="hideConfig">
+  <div class="col-6">
+    <nb-card>
+      <nb-card-header class="text-center">
+        Configuration
+      </nb-card-header>
+      <nb-card-body>
+        <form [formGroup]="configForm" (ngSubmit)="saveConfig()">
+          <div class="form-group row">
+            <label class="private_token" class="col-form-label col-sm-3">Your Private Token</label>
+            <div class="col-sm-9">
+              <input
+                placeholder="Private Token"
+                id="private_token"
+                class="form-control"
+                name="private_token"
+                formControlName="privateToken"
+                nbInput
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="refreshTime" class="col-form-label col-sm-3">Refresh time</label>
+            <div class="col-sm-9">
+              <input
+                placeholder="Refresh time"
+                id="refreshTime"
+                class="form-control"
+                type="number"
+                name="refreshTime"
+                formControlName="refreshTime"
+                nbInput
+              />
+              <small class="form-text text-muted">Not under 5 secs</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <button nbButton type="submit" [disabled]="!configForm.valid" fullWidth>
+              <nb-icon icon="checkmark-outline"></nb-icon>
+              Save
+            </button>
+          </div>
+        </form>
+      </nb-card-body>
+    </nb-card>
+  </div>
 </div>
-
 <div class="row" *ngIf="mainLoading">
-    <div class="col">
-        <nb-card [nbSpinner]="mainLoading">
-            <nb-card-body>Loading please wait...</nb-card-body>
-        </nb-card>
-    </div>
+  <div class="col">
+    <nb-card [nbSpinner]="mainLoading">
+      <nb-card-body>Loading please wait...</nb-card-body>
+    </nb-card>
+  </div>
 </div>
-
-<div class="row" *ngIf="repos.length > 0">
-    <div class="col-3" *ngFor="let repo of repos">
-        <nb-card [nbSpinner]="isLoading(repo) && loader">
-            <nb-card-header><span><a href="{{repo.web_url}}" target="_blank"
-                                     class="">{{repo.path_with_namespace}}</a>
-                <br /> {{repo.default_branch}}
-                <br />
-            <small *ngIf="repo.commits"><nb-icon icon="calendar-outline"></nb-icon> Updated the {{repo.commits[0].created_at | date}}</small></span>
-                <span class="float-right"
-                                                                                           *ngIf="repo.pipelines"><img
-                    src="https://gitlab.com/{{repo.path_with_namespace}}/badges/{{repo.default_branch}}/pipeline.svg"/></span>
-            </nb-card-header>
-            <nb-card-body *ngIf="repo.commits">
-                Last commit {{repo.commits[0].short_id}} : {{repo.commits[0].title}}
-            </nb-card-body>
-            <nb-card-body *ngIf="repo.pipelines">
-<!--                <nb-alert *ngFor="let pipeline of repo.lastPipelines" [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)" ><a class="a-not-blue" href="{{pipeline.pipeline.web_url}}" target="_blank">{{pipeline.ref}} : {{pipeline.pipeline.status}}</a></nb-alert>-->
-                <nb-progress-bar class="mb-3" *ngFor="let pipeline of repo.lastPipelines" [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)" [value]="pipelineStatusToValue(pipeline.pipeline.status)"><a class="a-not-blue" href="{{pipeline.pipeline.web_url}}" target="_blank">{{pipeline.ref}} : {{pipeline.pipeline.status}}</a></nb-progress-bar>
-            </nb-card-body>
-            <nb-card-body *ngIf="repo.tags">
-                Registry tags : <ul><li *ngFor="let tag of repo.tags">{{tag.name}}</li></ul>
-            </nb-card-body>
-        </nb-card>
+<div class="row" *ngIf="groups$ | async as groups">
+  <ng-container *ngIf="!mainLoading && showGroups">
+    <div class="col-2" *ngFor="let group of groups">
+      <nb-card>
+        <nb-card-header>{{ group.full_name }}</nb-card-header>
+        <nb-card-body>
+          <ng-container *ngIf="group.selected; else selectBtn">
+            <button nbButton fullWidth status="warning" (click)="group.selected = false; setGroupSelected(groups)">
+              Unselect
+            </button>
+          </ng-container>
+          <ng-template #selectBtn>
+            <button nbButton fullWidth status="primary" (click)="group.selected = true; setGroupSelected(groups)">
+              Select
+            </button>
+          </ng-template>
+        </nb-card-body>
+      </nb-card>
     </div>
+    <div class="col-4 offset-4">
+      <button nbButton fullWidth status="success" [disabled]="groupsSelected.length <= 0" (click)="nextProjects()">
+        Next
+        <nb-icon icon="arrow-forward-outline"></nb-icon>
+      </button>
+    </div>
+  </ng-container>
+</div>
+<div class="row" *ngIf="projects$ | async as projects">
+  <ng-container *ngIf="!mainLoading && showProjects">
+    <div class="col-2" *ngFor="let project of projects">
+      <nb-card *ngIf="!mainLoading">
+        <nb-card-header>
+          {{ project.name }}
+        </nb-card-header>
+        <nb-card-body>
+          <ng-container *ngIf="!project.exclude; else includeBtn">
+            <button nbButton fullWidth status="danger" (click)="project.exclude = true; setProjectsInclude(projects)">
+              Exclude
+            </button>
+          </ng-container>
+          <ng-template #includeBtn>
+            <button nbButton fullWidth status="primary" (click)="project.exclude = false; setProjectsInclude(projects)">
+              Include
+            </button>
+          </ng-template>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div class="col-4 offset-4">
+      <button nbButton fullWidth status="success" [disabled]="projectsSelected.length <= 0" (click)="finishSelection()">
+        Valid
+        <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+      </button>
+    </div>
+  </ng-container>
+</div>
+<div class="row" *ngIf="projectsSelected.length > 0 && !showProjects">
+  <div class="col-3" *ngFor="let projectInfo$ of projectsInfo$$">
+    <nb-card *ngIf="projectInfo$ | async as project">
+      <nb-card-header>
+        <span>
+          <a href="{{ project.web_url }}" target="_blank" class=""> {{ project.path_with_namespace }}</a>
+          <br />
+          {{ project.default_branch }}
+          <br />
+          <small *ngIf="project.commits.length > 0"
+            ><nb-icon icon="calendar-outline"></nb-icon> Updated the
+            {{ project.commits[0].created_at | date }}
+          </small>
+        </span>
+        <span class="float-right" *ngIf="project.pipelines.length">
+          <img
+            src="https://gitlab.com/{{ project.path_with_namespace }}/badges/{{ project.default_branch }}/pipeline.svg"
+        /></span>
+      </nb-card-header>
+      <nb-card-body *ngIf="project.commits">
+        Last commit {{ project.commits[0].short_id }} : {{ project.commits[0].title }}
+      </nb-card-body>
+      <nb-card-body *ngIf="project.pipelines">
+        <!--                <nb-alert *ngFor="let pipeline of project.lastPipelines" [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)" ><a class="a-not-blue" href="{{pipeline.pipeline.web_url}}" target="_blank">{{pipeline.ref}} : {{pipeline.pipeline.status}}</a></nb-alert>-->
+        <nb-progress-bar
+          class="mb-3"
+          *ngFor="let pipeline of project.lastPipelines"
+          [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)"
+          [value]="pipelineStatusToValue(pipeline.pipeline.status)"
+          ><a class="a-not-blue" href="{{ pipeline.pipeline.web_url }}" target="_blank"
+            >{{ pipeline.ref }} : {{ pipeline.pipeline.status }}</a
+          ></nb-progress-bar
+        >
+      </nb-card-body>
+      <nb-card-body *ngIf="project.tags.length">
+        Registry tags :
+        <ul>
+          <li *ngFor="let tag of project.tags">{{ tag.name }}</li>
+        </ul>
+      </nb-card-body>
+    </nb-card>
+  </div>
 </div>
