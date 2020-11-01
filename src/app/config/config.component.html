@@ -62,17 +62,17 @@
 
 <div class="row" *ngIf="groups$ | async as groups">
   <ng-container *ngIf="!loader && showGroups">
-    <div class="col-2" *ngFor="let group of groups; let i = index">
+    <div class="col-2" *ngFor="let group of groups">
       <nb-card>
         <nb-card-header>{{ group.full_name }}</nb-card-header>
         <nb-card-body>
           <ng-container *ngIf="group.selected; else selectBtn">
-            <button nbButton fullWidth status="warning" (click)="removeGroup(i, group)">
+            <button nbButton fullWidth status="warning" (click)="removeGroup(group)">
               Unselect
             </button>
           </ng-container>
           <ng-template #selectBtn>
-            <button nbButton fullWidth status="primary" (click)="addGroup(i, group)">
+            <button nbButton fullWidth status="primary" (click)="addGroup(group)">
               Select
             </button>
           </ng-template>
@@ -95,19 +95,19 @@
 </div>
 <div class="row" *ngIf="projects$ | async as projects">
   <ng-container *ngIf="!loader && showProjects">
-    <div class="col-2" *ngFor="let project of projects; let i = index">
+    <div class="col-2" *ngFor="let project of projects">
       <nb-card *ngIf="!loader">
         <nb-card-header>
           {{ project.name }}
         </nb-card-header>
         <nb-card-body>
           <ng-container *ngIf="project.include; else includeBtn">
-            <button nbButton fullWidth status="danger" (click)="removeProject(i, project)">
+            <button nbButton fullWidth status="danger" (click)="removeProject(project)">
               Unselect
             </button>
           </ng-container>
           <ng-template #includeBtn>
-            <button nbButton fullWidth status="primary" (click)="addProject(i, project)">
+            <button nbButton fullWidth status="primary" (click)="addProject(project)">
               Select
             </button>
           </ng-template>

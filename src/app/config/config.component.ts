@@ -8,6 +8,7 @@ import { Project } from '../../models/project';
 import { GitlabService } from '../../services/gitlab.service';
 import { Router } from '@angular/router';
 import { Config } from '../../models/config';
+import { findIndex } from '../utils/array/array.utils';
 
 @Component({
   selector: 'app-config',
@@ -49,7 +50,7 @@ export class ConfigComponent implements OnInit {
         tap(() => (this.loader = true)),
         mergeMap(groups => groups.map(group => this.gitlabService.getProjects(group.id))),
         concatAll(),
-        tap(projects => projects.forEach((p, i) => this.addProject(i, p))),
+        tap(projects => projects.forEach(p => this.addProject(p))),
         scan((acc, curr) => [...acc, ...curr], []),
         tap(() => (this.loader = false))
       )
@@ -68,23 +69,25 @@ export class ConfigComponent implements OnInit {
     return this.configForm.controls.projects as FormArray;
   }
 
-  addGroup(i: number, group: Group) {
+  addGroup(group: Group) {
     group.selected = true;
-    this.groups.insert(i, this.fb.control(group));
+    this.groups.push(this.fb.control(group));
   }
 
-  removeGroup(i: number, group: Group) {
+  removeGroup(group: Group) {
     group.selected = false;
+    const i = findIndex(this.groups.value, g => g.id === group.id);
     this.groups.removeAt(i);
   }
 
-  addProject(i: number, project: Project) {
+  addProject(project: Project) {
     project.include = true;
-    this.projects.insert(i, this.fb.control(project));
+    this.projects.push(this.fb.control(project));
   }
 
-  removeProject(i: number, project: Project) {
+  removeProject(project: Project) {
     project.include = false;
+    const i = findIndex(this.projects.value, p => p.id === project.id);
     this.projects.removeAt(i);
   }
 
@@ -104,6 +107,7 @@ export class ConfigComponent implements OnInit {
 
   finishSelection() {
     this.configService.config = this._formatConfig();
+    console.log(this.configForm.value);
     this.router.navigate(['/pipelines']);
   }
 
