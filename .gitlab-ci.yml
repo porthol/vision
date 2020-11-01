@@ -38,7 +38,8 @@ deploy:
     - build
   only:
     - /^[0-9]+\.[0-9]+\.[0-9]+$/
-    - tags
+  except:
+    - branches
   image: kroniak/ssh-client
   script:
     - mkdir -p ~/.ssh
