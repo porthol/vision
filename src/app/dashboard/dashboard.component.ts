@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { GitlabService } from '../../services/gitlab.service';
 import { Project } from '../../models/project';
 import { ConfigService } from '../../services/config.service';
-import { concatAll, first, map, mergeMap, scan, switchMap, tap } from 'rxjs/operators';
+import { concatAll, filter, first, map, mergeMap, scan, switchMap, tap } from 'rxjs/operators';
 import { combineLatest, Observable, of, timer } from 'rxjs';
+import { PipelineStatus, pipelineStatusToIcon, pipelineStatusToNbStatus } from '../../models/pipeline';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,51 +13,32 @@ import { combineLatest, Observable, of, timer } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent {
-  mainLoading = true;
+  loader = true;
 
   config$ = this.configService.config$.pipe(
-    switchMap(config => {
-      if (config.groups.length && config.privateToken) {
-        return this.gitlabService.getGroups().pipe(
-          first(),
-          map(groups => groups.filter(g => config.groups.includes(g.id)).map(g => ({ ...g, selected: true }))),
-          mergeMap(groups => groups.map(group => this.gitlabService.getProjects(group.id))),
-          concatAll(),
-          scan((acc, curr) => [...acc, ...curr], []),
-          map(projects => projects.filter(p => config.projects.includes(p.id)).map(p => ({ ...p, exclude: false }))),
-          tap(() => (this.mainLoading = false)),
-          tap(projects => this.generateDataLoading(projects))
-        );
-      } else {
-        this.mainLoading = false;
-      }
-    })
+    filter(config => !!(config.groups.length && config.privateToken)),
+    switchMap(config =>
+      this.gitlabService.getGroups().pipe(
+        first(),
+        map(groups => groups.filter(g => config.groups.includes(g.id)).map(g => ({ ...g, selected: true }))),
+        mergeMap(groups => groups.map(group => this.gitlabService.getProjects(group.id))),
+        concatAll(),
+        scan((acc, curr) => [...acc, ...curr], []),
+        map(projects => projects.filter(p => config.projects.includes(p.id)).map(p => ({ ...p, exclude: false }))),
+        tap(() => (this.loader = false)),
+        tap(projects => this.generateDataLoading(projects))
+      )
+    )
   );
 
   projectsInfo$$: Observable<Project>[] = [];
 
   constructor(private gitlabService: GitlabService, private configService: ConfigService) {}
 
-  pipelineStatusToNbStatus(pipelineStatus: string) {
-    switch (pipelineStatus) {
-      case 'running':
-        return 'info';
-      case 'pending':
-        return 'warning';
-      case 'success':
-        return 'success';
-      case 'failed':
-        return 'danger';
-      case 'canceled':
-        return '';
-      case 'skipped':
-        return 'primary';
-      default:
-        return '';
-    }
-  }
+  pipelineStatusToNbStatus = pipelineStatusToNbStatus;
+  pipelineStatusToIcon = pipelineStatusToIcon;
 
-  pipelineStatusToValue(pipelineStatus: string) {
+  pipelineStatusToValue(pipelineStatus: PipelineStatus) {
     switch (pipelineStatus) {
       case 'running':
         return 60;

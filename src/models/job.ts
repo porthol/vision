@@ -1,12 +1,12 @@
 import { Project } from './project';
-import { Pipeline } from './pipeline';
+import { Pipeline, PipelineStatus } from './pipeline';
 import { Commit } from './commit';
 import { User } from './user';
 
 export interface Job {
   id: number;
   ip_address: string;
-  status: string;
+  status: PipelineStatus;
   stage: string;
   name: string;
   ref: string;

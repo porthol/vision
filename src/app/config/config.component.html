@@ -1,6 +1,6 @@
-<div class="row" *ngIf="mainLoading">
+<div class="row" *ngIf="loader">
   <div class="col">
-    <nb-card [nbSpinner]="mainLoading">
+    <nb-card [nbSpinner]="loader">
       <nb-card-body>Loading please wait...</nb-card-body>
     </nb-card>
   </div>
@@ -61,7 +61,7 @@
 </div>
 
 <div class="row" *ngIf="groups$ | async as groups">
-  <ng-container *ngIf="!mainLoading && showGroups">
+  <ng-container *ngIf="!loader && showGroups">
     <div class="col-2" *ngFor="let group of groups; let i = index">
       <nb-card>
         <nb-card-header>{{ group.full_name }}</nb-card-header>
@@ -94,9 +94,9 @@
   </ng-container>
 </div>
 <div class="row" *ngIf="projects$ | async as projects">
-  <ng-container *ngIf="!mainLoading && showProjects">
+  <ng-container *ngIf="!loader && showProjects">
     <div class="col-2" *ngFor="let project of projects; let i = index">
-      <nb-card *ngIf="!mainLoading">
+      <nb-card *ngIf="!loader">
         <nb-card-header>
           {{ project.name }}
         </nb-card-header>

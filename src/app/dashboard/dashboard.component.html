@@ -1,6 +1,6 @@
-<div class="row" *ngIf="mainLoading">
+<div class="row" *ngIf="loader">
   <div class="col">
-    <nb-card [nbSpinner]="mainLoading">
+    <nb-card [nbSpinner]="loader">
       <nb-card-body>Loading please wait...</nb-card-body>
     </nb-card>
   </div>
@@ -31,17 +31,16 @@
           Last commit {{ project.commits[0].short_id }} : {{ project.commits[0].title }}
         </nb-card-body>
         <nb-card-body *ngIf="project.pipelines">
-          <!--                <nb-alert *ngFor="let pipeline of project.lastPipelines" [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)" ><a class="a-not-blue" href="{{pipeline.pipeline.web_url}}" target="_blank">{{pipeline.ref}} : {{pipeline.pipeline.status}}</a></nb-alert>-->
-          <nb-progress-bar
+          <nb-alert
+            [outline]="pipelineStatusToNbStatus(pipeline.pipeline.status)"
             class="mb-3"
             *ngFor="let pipeline of project.lastPipelines"
-            [status]="pipelineStatusToNbStatus(pipeline.pipeline.status)"
-            [value]="pipelineStatusToValue(pipeline.pipeline.status)"
           >
+            <nb-icon [icon]="pipelineStatusToIcon(pipeline.pipeline.status)"></nb-icon>
             <a class="a-not-blue" href="{{ pipeline.pipeline.web_url }}" target="_blank"
               >{{ pipeline.ref }} : {{ pipeline.pipeline.status }}</a
             >
-          </nb-progress-bar>
+          </nb-alert>
         </nb-card-body>
         <nb-card-body *ngIf="project.tags.length">
           Registry tags :

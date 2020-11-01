@@ -1,1 +1,26 @@
-<p>runners works!</p>
+<div class="row" *ngIf="loader">
+  <div class="col">
+    <nb-card [nbSpinner]="loader">
+      <nb-card-body>Loading please wait...</nb-card-body>
+    </nb-card>
+  </div>
+</div>
+
+<div class="row" *ngIf="runners$ | async as runners">
+  <div class="col" *ngFor="let runner of runners">
+    <nb-card>
+      <nb-card-header>
+        <h3>{{ runner.name }}</h3>
+        <h4>{{ runner.description }}</h4>
+      </nb-card-header>
+      <nb-card-body *ngIf="runnersJobs$$[runner.id] | async as jobs">
+        <nb-alert *ngFor="let job of jobs" [outline]="pipelineStatusToNbStatus(job.status)">
+          <nb-icon [icon]="pipelineStatusToIcon(job.status)"></nb-icon>
+          {{ job.name }} : {{ job.status }} on {{ job.project.name_with_namespace }}<br />
+          Ref {{ job.ref }} by {{ job.commit.author_name }} : #{{ job.commit.short_id }} <br />
+          At {{ job.created_at | date: 'short' }} : {{ job.duration | time: '{min}:{sec}' }}
+        </nb-alert>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>

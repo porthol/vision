@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ConfigService } from '../../services/config.service';
 import { concat, Observable, of, Subject } from 'rxjs';
@@ -15,10 +15,10 @@ import { Config } from '../../models/config';
   styleUrls: ['./config.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ConfigComponent {
+export class ConfigComponent implements OnInit {
   loadGroups$ = new Subject();
   loadProjects$ = new Subject<Group[]>();
-  mainLoading = false;
+  loader = false;
   showGroups = false;
   showProjects = false;
   configForm: FormGroup = new FormGroup({
@@ -32,30 +32,33 @@ export class ConfigComponent {
     private configService: ConfigService,
     private fb: FormBuilder,
     private gitlabService: GitlabService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private router: Router
   ) {}
 
   groups$: Observable<Group[]> = this.loadGroups$.pipe(
     tap(() => (this.showGroups = true)),
-    tap(() => (this.mainLoading = true)),
+    tap(() => (this.loader = true)),
     switchMap(() => this.gitlabService.getGroups()),
-    tap(() => (this.mainLoading = false))
+    tap(() => (this.loader = false))
   );
 
   projects$: Observable<Project[]> = this.loadProjects$.pipe(
     switchMap(groups =>
       concat(of(groups)).pipe(
         tap(() => (this.showProjects = true)),
-        tap(() => (this.mainLoading = true)),
+        tap(() => (this.loader = true)),
         mergeMap(groups => groups.map(group => this.gitlabService.getProjects(group.id))),
         concatAll(),
         tap(projects => projects.forEach((p, i) => this.addProject(i, p))),
         scan((acc, curr) => [...acc, ...curr], []),
-        tap(() => (this.mainLoading = false))
+        tap(() => (this.loader = false))
       )
     )
   );
+
+  ngOnInit(): void {
+    this.configForm.patchValue(this.configService.configSnapshot);
+  }
 
   get groups() {
     return this.configForm.controls.groups as FormArray;
@@ -86,7 +89,10 @@ export class ConfigComponent {
   }
 
   nextGroups() {
-    this.configService.config = this._formatConfig(); // first save for private token
+    this.configService.config = {
+      ...this.configService.configSnapshot,
+      privateToken: this.configForm.value.privateToken
+    }; // first save for private token
     this.showGroups = true;
     this.loadGroups$.next();
   }
