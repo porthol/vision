@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { RunnersComponent } from './runners/runners.component';
 
 const routes: Routes = [
   {
@@ -9,16 +7,20 @@ const routes: Routes = [
     children: [
       {
         path: 'pipelines',
-        component: DashboardComponent
+        loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule)
       },
       {
         path: 'runners',
-        component: RunnersComponent
+        loadChildren: () => import('./runners/runners.module').then(m => m.RunnersModule)
+      },
+      {
+        path: 'config',
+        loadChildren: () => import('./config/config.module').then(m => m.ConfigModule)
       },
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'pipelines'
+        redirectTo: 'config'
       }
     ]
   }

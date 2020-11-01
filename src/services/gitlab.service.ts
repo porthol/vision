@@ -10,6 +10,7 @@ import { Registry } from '../models/registry';
 import { Observable } from 'rxjs';
 import { Runner } from '../models/runner';
 import { Job } from '../models/job';
+import { map } from 'rxjs/operators';
 
 export interface RunnerParams {
   scope?: string;
@@ -27,7 +28,9 @@ export class GitlabService {
   }
 
   getProjects(groupId: number) {
-    return this.http.get<Project[]>(environment.apiUrl + 'groups/' + groupId + '/projects');
+    return this.http
+      .get<Project[]>(environment.apiUrl + 'groups/' + groupId + '/projects')
+      .pipe(map(projects => projects.map(p => ({ ...p, include: true }))));
   }
 
   getPipelines(projectId: number) {

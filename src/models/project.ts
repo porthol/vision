@@ -17,6 +17,6 @@ export class Project {
   web_url: string;
   commits: Commit[];
   refs: string[];
-  exclude = false;
+  include = true;
   lastPipelines: { ref: string; pipeline: Pipeline }[];
 }

@@ -1,0 +1,130 @@
+<div class="row" *ngIf="mainLoading">
+  <div class="col">
+    <nb-card [nbSpinner]="mainLoading">
+      <nb-card-body>Loading please wait...</nb-card-body>
+    </nb-card>
+  </div>
+</div>
+<div class="row justify-content-center" [hidden]="showGroups || showProjects">
+  <div class="col-6">
+    <nb-card>
+      <nb-card-header class="text-center">
+        Configuration
+      </nb-card-header>
+      <nb-card-body>
+        <form [formGroup]="configForm">
+          <div class="form-group row">
+            <label for="private_token" class="col-form-label col-sm-3">Your Private Token</label>
+            <div class="col-sm-9">
+              <input
+                placeholder="Private Token"
+                id="private_token"
+                class="form-control"
+                name="private_token"
+                formControlName="privateToken"
+                nbInput
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="refreshTime" class="col-form-label col-sm-3">Refresh time</label>
+            <div class="col-sm-9">
+              <input
+                placeholder="Refresh time"
+                id="refreshTime"
+                class="form-control"
+                type="number"
+                name="refreshTime"
+                formControlName="refreshTime"
+                nbInput
+              />
+              <small class="form-text text-muted">Not under 5 secs</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <button
+              nbButton
+              type="button"
+              [disabled]="!configForm.value.privateToken"
+              status="primary"
+              fullWidth
+              (click)="nextGroups()"
+            >
+              <nb-icon icon="arrow-circle-right-outline"></nb-icon>
+              Next
+            </button>
+          </div>
+        </form>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>
+
+<div class="row" *ngIf="groups$ | async as groups">
+  <ng-container *ngIf="!mainLoading && showGroups">
+    <div class="col-2" *ngFor="let group of groups; let i = index">
+      <nb-card>
+        <nb-card-header>{{ group.full_name }}</nb-card-header>
+        <nb-card-body>
+          <ng-container *ngIf="group.selected; else selectBtn">
+            <button nbButton fullWidth status="warning" (click)="removeGroup(i, group)">
+              Unselect
+            </button>
+          </ng-container>
+          <ng-template #selectBtn>
+            <button nbButton fullWidth status="primary" (click)="addGroup(i, group)">
+              Select
+            </button>
+          </ng-template>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div class="col-4 offset-4">
+      <button
+        nbButton
+        fullWidth
+        status="success"
+        [disabled]="configForm.value.groups.length <= 0"
+        (click)="nextProjects()"
+      >
+        Next
+        <nb-icon icon="arrow-forward-outline"></nb-icon>
+      </button>
+    </div>
+  </ng-container>
+</div>
+<div class="row" *ngIf="projects$ | async as projects">
+  <ng-container *ngIf="!mainLoading && showProjects">
+    <div class="col-2" *ngFor="let project of projects; let i = index">
+      <nb-card *ngIf="!mainLoading">
+        <nb-card-header>
+          {{ project.name }}
+        </nb-card-header>
+        <nb-card-body>
+          <ng-container *ngIf="project.include; else includeBtn">
+            <button nbButton fullWidth status="danger" (click)="removeProject(i, project)">
+              Unselect
+            </button>
+          </ng-container>
+          <ng-template #includeBtn>
+            <button nbButton fullWidth status="primary" (click)="addProject(i, project)">
+              Select
+            </button>
+          </ng-template>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div class="col-4 offset-4">
+      <button
+        nbButton
+        fullWidth
+        status="success"
+        [disabled]="configForm.value.projects.length <= 0"
+        (click)="finishSelection()"
+      >
+        Valid
+        <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+      </button>
+    </div>
+  </ng-container>
+</div>

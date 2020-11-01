@@ -10,6 +10,7 @@ import {
   NbButtonModule,
   NbCardModule,
   NbDatepickerModule,
+  NbDialogModule,
   NbGlobalLogicalPosition,
   NbIconModule,
   NbInputModule,
@@ -23,14 +24,16 @@ import {
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { GitlabService } from '../services/gitlab.service';
 import { NavbarComponent } from './navbar/navbar.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfigService } from '../services/config.service';
-import { RunnersComponent } from './runners/runners.component';
+import { ConfigModule } from './config/config.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { RunnersModule } from './runners/runners.module';
+
 @NgModule({
-  declarations: [AppComponent, NavbarComponent, DashboardComponent, RunnersComponent],
+  declarations: [AppComponent, NavbarComponent],
   imports: [
     BrowserModule,
     RouterModule,
@@ -47,16 +50,11 @@ import { RunnersComponent } from './runners/runners.component';
     }),
     NbLayoutModule,
     NbCardModule,
-    NbMenuModule,
     NbIconModule,
     AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    NbButtonModule,
-    NbSpinnerModule,
-    NbAlertModule,
-    NbProgressBarModule,
-    NbInputModule
+    ConfigModule,
+    DashboardModule,
+    RunnersModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorService, multi: true },
