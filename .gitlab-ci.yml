@@ -1,3 +1,7 @@
+stages:
+  - build
+  - deploy
+
 .build:
   stage: build
   image: docker:latest
@@ -27,3 +31,19 @@ build:
     - tags
   except:
     - master
+
+deploy:
+  stage: deploy
+  needs:
+    - build
+  only:
+    - /^[0-9]+\.[0-9]+\.[0-9]+$/
+    - tags
+  image: kroniak/ssh-client
+  script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh $SSH_USERNAME@$SSH_SERVER_IP -p $SSH_PORT "kubectl set image deployments/vision vision=$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME --record"
