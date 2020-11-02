@@ -17,20 +17,23 @@ export class RunnersComponent {
 
   constructor(private configService: ConfigService, private gitlabService: GitlabService) {}
 
-  runners$ = timer(0, this.configService.configSnapshot.refreshTime * 1000).pipe(
-    switchMap(() => this.gitlabService.getRunners()),
-    tap(runners => runners.forEach(r => (this.runnersJobs$$[r.id] = this.getRunnerJobs(r))))
-  );
+  runners$ = this.gitlabService
+    .getRunners()
+    .pipe(tap(runners => runners.forEach(r => (this.runnersJobs$$[r.id] = this.getRunnerJobs(r)))));
 
   pipelineStatusToNbStatus = pipelineStatusToNbStatus;
   pipelineStatusToIcon = pipelineStatusToIcon;
   runnersJobs$$: Observable<Job[]>[] = [];
 
   getRunnerJobs(runner: Runner) {
-    return this.gitlabService.getRunnerJob(runner.id).pipe(
-      map(jobs => {
-        return jobs.splice(0, 3);
-      })
+    return timer(0, this.configService.configSnapshot.refreshTime * 1000).pipe(
+      switchMap(() => this.gitlabService.getRunnerJobsHeaders(runner.id)),
+      switchMap(res => {
+        return this.gitlabService.getRunnerJobs(runner.id, {
+          page: res.headers.get('x-total-pages')
+        });
+      }),
+      map(jobs => jobs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).splice(0, 3))
     );
   }
 }

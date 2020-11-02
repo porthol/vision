@@ -55,7 +55,13 @@ export class GitlabService {
     return this.http.get<Runner[]>(environment.apiUrl + 'runners', { params: filter as HttpParams });
   }
 
-  getRunnerJob(runnerId: number) {
-    return this.http.get<Job[]>(environment.apiUrl + 'runners/' + runnerId + '/jobs');
+  getRunnerJobs(runnerId: number, params?: {}) {
+    return this.http.get<Job[]>(environment.apiUrl + 'runners/' + runnerId + '/jobs', {
+      params
+    });
+  }
+
+  getRunnerJobsHeaders(runnerId: number) {
+    return this.http.get(environment.apiUrl + 'runners/' + runnerId + '/jobs', { observe: 'response' });
   }
 }
