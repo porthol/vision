@@ -19,7 +19,6 @@ export class RunnersComponent {
 
   runners$ = timer(0, this.configService.configSnapshot.refreshTime * 1000).pipe(
     switchMap(() => this.gitlabService.getRunners()),
-    tap(console.log),
     tap(runners => runners.forEach(r => (this.runnersJobs$$[r.id] = this.getRunnerJobs(r))))
   );
 
@@ -31,8 +30,7 @@ export class RunnersComponent {
     return this.gitlabService.getRunnerJob(runner.id).pipe(
       map(jobs => {
         return jobs.splice(0, 3);
-      }),
-      tap(console.log)
+      })
     );
   }
 }

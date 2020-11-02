@@ -1,4 +1,5 @@
 stages:
+  - codestyle
   - build
   - deploy
 
@@ -14,6 +15,20 @@ stages:
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
     - docker tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" "$DOCKER_HUB_IMAGE:$CI_COMMIT_REF_NAME"
     - docker push "$DOCKER_HUB_IMAGE:$CI_COMMIT_REF_NAME"
+
+prettier:check:
+  stage: codestyle
+  image: node:12
+  script:
+    - npm i
+    - npm run prettier-check
+
+lint:
+  stage: codestyle
+  image: node:12
+  script:
+    - npm i
+    - npm run lint
 
 build-master:
   extends:

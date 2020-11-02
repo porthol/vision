@@ -3,9 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-    production: false,
-    title: 'vision',
-    apiUrl: 'https://gitlab.com/api/v4/'
+  production: false,
+  title: 'vision',
+  apiUrl: 'https://gitlab.com/api/v4/'
 };
 
 /*
