@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { ConfigService } from '../../services/config.service';
 import { GitlabService } from '../../services/gitlab.service';
-import { map, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { Runner } from '../../models/runner';
-import { Observable } from 'rxjs';
+import { Observable, timer } from 'rxjs';
 import { Job } from '../../models/job';
 import { pipelineStatusToIcon, pipelineStatusToNbStatus } from '../../models/pipeline';
 
@@ -17,7 +17,8 @@ export class RunnersComponent {
 
   constructor(private configService: ConfigService, private gitlabService: GitlabService) {}
 
-  runners$ = this.gitlabService.getRunners().pipe(
+  runners$ = timer(0, this.configService.configSnapshot.refreshTime * 1000).pipe(
+    switchMap(() => this.gitlabService.getRunners()),
     tap(console.log),
     tap(runners => runners.forEach(r => (this.runnersJobs$$[r.id] = this.getRunnerJobs(r))))
   );
